@@ -1,147 +1,141 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
-interface Control {
-    void turnOn();
-    void turnOff();
+/**
+ * Represents a smart home system where multiple appliances can be controlled.
+ * Provides features to add appliances, turn them on/off, and monitor active devices.
+ */
+class Appliance {
+    private String name;
+    private boolean status; // true = ON, false = OFF
+
+    public Appliance(String name) {
+        this.name = name;
+        this.status = false; // default OFF
+    }
+
+    /** Returns the appliance name */
+    public String getName() {
+        return name;
+    }
+
+    /** Returns true if appliance is ON */
+    public boolean isOn() {
+        return status;
+    }
+
+    /**
+     * Sets the status of the appliance
+     * @param status true = ON, false = OFF
+     */
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
 }
 
-abstract class Device {
-    private String deviceName;
-    private String location;
-    
-    public Device(String name, String location) {
-        this.deviceName = name;
-        this.location = location;
-    }
-    
-    public abstract void showStatus();
-    
-    public String getDeviceName() { return deviceName; }
-    public String getLocation() { return location; }
-}
+/**
+ * Main SmartHome class that manages all appliances
+ */
+class SmartHome {
+    private ArrayList<Appliance> appliances;
 
-class Light extends Device implements Control {
-    private boolean isOn;
-    private int brightness;
-    
-    public Light(String name, String location) {
-        super(name, location);
-        this.isOn = false;
-        this.brightness = 50;
+    public SmartHome() {
+        appliances = new ArrayList<>();
     }
-    
-    @Override
-    public void showStatus() {
-        String status = isOn ? "ON" : "OFF";
-        System.out.println(getDeviceName() + " in " + getLocation() + " is " + status);
-        if (isOn) {
-            System.out.println("Brightness: " + brightness + "%");
+
+    /** Adds a new appliance to the system */
+    public void addAppliance(String name) {
+        appliances.add(new Appliance(name));
+        System.out.println("Appliance \"" + name + "\" added successfully.");
+    }
+
+    /** Displays all appliances with their current status */
+    public void showAppliances() {
+        System.out.println("All appliances in Smart Home:");
+        for (Appliance appliance : appliances) {
+            System.out.println("- " + appliance.getName() + " [" + (appliance.isOn() ? "ON" : "OFF") + "]");
         }
     }
-    
-    @Override
-    public void turnOn() {
-        isOn = true;
-        System.out.println(getDeviceName() + " turned ON");
-    }
-    
-    @Override
-    public void turnOff() {
-        isOn = false;
-        System.out.println(getDeviceName() + " turned OFF");
-    }
-    
-    public void setBrightness(int level) {
-        if (isOn && level >= 0 && level <= 100) {
-            brightness = level;
-            System.out.println("Brightness set to " + level + "%");
-        } else if (!isOn) {
-            System.out.println("Turn on the light first before adjusting brightness!");
-        } else {
-            System.out.println("Brightness must be between 0 and 100!");
-        }
-    }
-}
 
-public class SmartHome2 {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.println("        SMART HOME SYSTEM       \n");
-        
-        Device[] homeDevices = {
-            new Light("Living Room Light", "Living Room"),
-            new Light("Kitchen Light", "Kitchen")
-        };
-        
-        boolean running = true;
-        
-        while (running) {
-            System.out.println("\n========= MENU =========");
-            System.out.println("1. Show Status of Devices");
-            System.out.println("2. Turn On a Device");
-            System.out.println("3. Turn Off a Device");
-            System.out.println("4. Adjust Brightness of a Light");
-            System.out.println("5. Exit");
-            System.out.print("Choose an option: ");
-            
-            int choice = sc.nextInt();
-            sc.nextLine(); // consume newline
-            
-            switch (choice) {
-                case 1:
-                    System.out.println("\nDevice Status:");
-                    for (Device device : homeDevices) {
-                        device.showStatus();
-                    }
-                    break;
-                    
-                case 2:
-                    System.out.println("Which device to turn ON?");
-                    for (int i = 0; i < homeDevices.length; i++) {
-                        System.out.println((i + 1) + ". " + homeDevices[i].getDeviceName());
-                    }
-                    int onChoice = sc.nextInt() - 1;
-                    if (onChoice >= 0 && onChoice < homeDevices.length) {
-                        ((Control) homeDevices[onChoice]).turnOn();
-                    }
-                    break;
-                    
-                case 3:
-                    System.out.println("Which device to turn OFF?");
-                    for (int i = 0; i < homeDevices.length; i++) {
-                        System.out.println((i + 1) + ". " + homeDevices[i].getDeviceName());
-                    }
-                    int offChoice = sc.nextInt() - 1;
-                    if (offChoice >= 0 && offChoice < homeDevices.length) {
-                        ((Control) homeDevices[offChoice]).turnOff();
-                    }
-                    break;
-                    
-                case 4:
-                    System.out.println("Which light to adjust brightness?");
-                    for (int i = 0; i < homeDevices.length; i++) {
-                        if (homeDevices[i] instanceof Light) {
-                            System.out.println((i + 1) + ". " + homeDevices[i].getDeviceName());
-                        }
-                    }
-                    int lightChoice = sc.nextInt() - 1;
-                    if (lightChoice >= 0 && lightChoice < homeDevices.length && homeDevices[lightChoice] instanceof Light) {
-                        System.out.print("Enter brightness (0–100): ");
-                        int level = sc.nextInt();
-                        ((Light) homeDevices[lightChoice]).setBrightness(level);
-                    }
-                    break;
-                    
-                case 5:
-                    running = false;
-                    System.out.println("Exiting Smart Home System...");
-                    break;
-                    
-                default:
-                    System.out.println("Invalid choice! Please try again.");
+    /** Turns a specific appliance ON or OFF */
+    public void controlAppliance(String name, boolean turnOn) {
+        for (Appliance appliance : appliances) {
+            if (appliance.getName().equalsIgnoreCase(name)) {
+                appliance.setStatus(turnOn);
+                System.out.println(appliance.getName() + " is now " + (turnOn ? "ON" : "OFF"));
+                return;
             }
         }
-        
+        System.out.println("Appliance \"" + name + "\" not found!");
+    }
+
+    /** Displays all currently active (ON) appliances */
+    public void showActiveAppliances() {
+        System.out.println("Active appliances:");
+        boolean anyActive = false;
+        for (Appliance appliance : appliances) {
+            if (appliance.isOn()) {
+                System.out.println("- " + appliance.getName());
+                anyActive = true;
+            }
+        }
+        if (!anyActive) {
+            System.out.println("No appliances are currently ON.");
+        }
+    }
+}
+
+/**
+ * Main entry point for the Smart Home system
+ */
+public class SmartHomeMain {
+    public static void main(String[] args) {
+        SmartHome smartHome = new SmartHome();
+        Scanner sc = new Scanner(System.in);
+        int choice;
+
+        do {
+            System.out.println("\n--- Smart Home System Menu ---");
+            System.out.println("1. Add Appliance");
+            System.out.println("2. Show All Appliances");
+            System.out.println("3. Turn Appliance ON");
+            System.out.println("4. Turn Appliance OFF");
+            System.out.println("5. Show Active Appliances");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter appliance name: ");
+                    String name = sc.nextLine();
+                    smartHome.addAppliance(name);
+                    break;
+                case 2:
+                    smartHome.showAppliances();
+                    break;
+                case 3:
+                    System.out.print("Enter appliance name to turn ON: ");
+                    name = sc.nextLine();
+                    smartHome.controlAppliance(name, true);
+                    break;
+                case 4:
+                    System.out.print("Enter appliance name to turn OFF: ");
+                    name = sc.nextLine();
+                    smartHome.controlAppliance(name, false);
+                    break;
+                case 5:
+                    smartHome.showActiveAppliances();
+                    break;
+                case 6:
+                    System.out.println("Exiting Smart Home System. Goodbye!");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        } while (choice != 6);
+
         sc.close();
     }
 }
