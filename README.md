@@ -55,26 +55,6 @@ Java (JDK 8 or higher)
 
 ArrayList & OOP concepts for data management
 
-💻 Installation Instructions
-
-Clone the repository:
-
-git clone https://github.com/YOUR_USERNAME/SmartHomeSystem_Vaibhav.git
-
-
-Navigate to the project directory:
-
-cd SmartHomeSystem_Vaibhav
-
-
-Compile the Java files:
-
-javac *.java
-
-
-Run the application:
-
-java SmartHomeMain
 
 🎯 Usage Instructions
 
